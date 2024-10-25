@@ -15,8 +15,7 @@ return {
 
     -- used to enable autocompletion (assign to every lsp server config)
     local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-    -- mason config
+   -- mason config
     require("mason-lspconfig").setup_handlers({
       -- default handler for installed servers
       function(server_name)
