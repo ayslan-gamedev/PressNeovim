@@ -59,5 +59,9 @@ return {
         "ts_ls"
       },
     })
+
+    vim.filetype.add({
+      pattern = { [".*/hyprland%.conf"] = "hyprlang" },
+    })
   end,
 }

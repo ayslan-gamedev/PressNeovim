@@ -5,14 +5,17 @@ return {
     "hrsh7th/cmp-buffer",   -- source for text in buffer
     "hrsh7th/cmp-path",     -- source for file system paths
     "hrsh7th/cmp-nvim-lsp", -- LSP source for cmp
+    "hrsh7th/cmp-nvim-lsp-signature-help"
+
   },
   config = function()
     -- nvim-cmp setup
     local cmp = require("cmp")
     cmp.setup({
+
       snippet = {
         expand = function(args)
-          require('luasnip').lsp_expand(args.body)   -- Para LuaSnip
+          require('luasnip').lsp_expand(args.body) -- Para LuaSnip
         end,
       },
       mapping = {
@@ -29,6 +32,8 @@ return {
         { name = 'nvim_lsp' }, -- LSP source
         { name = 'buffer' },   -- Buffer completions
         { name = 'path' },     -- Path completions
+
+        { name = 'nvim_lsp_signature_help' }
       },
     })
   end,

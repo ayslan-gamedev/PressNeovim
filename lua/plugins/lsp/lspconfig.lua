@@ -5,10 +5,13 @@ return {
     "hrsh7th/cmp-nvim-lsp",
     { "antosha417/nvim-lsp-file-operations", config = true },
     { "folke/neodev.nvim",                   opts = {} },
+    { "hrsh7th/cmp-nvim-lsp" },
+    { "lvimuser/lsp-inlayhints.nvim" }
   },
   config = function()
     -- import lspconfig plugin
     local lspconfig = require("lspconfig")
+    local configs = require("lspconfig.configs")
 
     -- used to enable autocompletion (assign to every lsp server config)
     local capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -26,6 +29,8 @@ return {
         lspconfig["svelte"].setup({
           capabilities = capabilities,
           on_attach = function(client, bufnr)
+            require("lsp-inlayhints").on_attach(client, bufnr)
+
             vim.api.nvim_create_autocmd("BufWritePost", {
               pattern = { "*.js", "*.ts" },
               callback = function(ctx)
@@ -79,14 +84,51 @@ return {
         -- configure clangd language server
         lspconfig["clangd"].setup({
           capabilities = capabilities,
-          cmd = { "clangd", "--background-index" }, -- Adiciona o comando e as opções do clangd
+          cmd = {
+            "clangd",
+            "--background-index",
+            "--clang-tidy",
+            "--completion-style=bundled",
+            "--cross-file-rename",
+            "--function-arg-placeholders",
+            "--header-insertion=iwyu",
+            "--header-insertion-decorators",
+            "-j=8",
+            "--malloc-trim",
+            "--pch-storage=memory",
+          },
           filetypes = { "c", "cpp", "objc", "objcpp" },
+          -- mapemaneto de teclas aqui (opcional)
           on_attach = function(client, bufnr)
-            -- Opcional: configurações adicionais no attach
-            -- Exemplo: definir mapeamentos de teclas aqui, se necessário
+            require("lsp-inlayhints").on_attacah(client, bufnr)
           end,
         })
       end,
     })
+
+    -- neocmakelsp config
+    if not configs.neocmake then
+      configs.neocmake = {
+        default_config = {
+          cmd = { "neocmakelsp", "--stdio" },
+          filetypes = { "cmake" },
+          root_dir = function(fname)
+            return lspconfig.util.find_git_ancestor(fname)
+          end,
+          single_file_support = true, -- suggested
+          on_attach = on_attach,      -- on_attach is the on_attach function you defined
+          init_options = {
+            format = {
+              enable = true
+            },
+            lint = {
+              enable = true
+            },
+            scan_cmake_in_package = true -- default is true
+          }
+        }
+      }
+      lspconfig.neocmake.setup({})
+    end
   end,
 }
